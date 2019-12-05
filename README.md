@@ -12,7 +12,11 @@ Role Variables
 --------------
 
 The path where to place koku source code:
+
+```
+defaults/main.yml:
 web_path: /var/www/html/koku
+```
 
 
 Dependencies
