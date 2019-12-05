@@ -13,7 +13,7 @@ Role Variables
 
 The path where to place koku source code:
 
-```
+```yaml
 defaults/main.yml:
 web_path: /var/www/html/koku
 ```
@@ -28,7 +28,7 @@ Example Playbook
 ----------------
 
 An ansible.cfg file is provided in the tests/ folder
-
+```yaml
 - name: install koku on a VM (CentOS/RHEL based)
   hosts: all
   remote_user: root
@@ -37,7 +37,7 @@ An ansible.cfg file is provided in the tests/ folder
 
   roles:
     - project-koku
-
+```
 
 License
 -------
