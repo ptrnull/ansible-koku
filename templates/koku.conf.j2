@@ -1,0 +1,16 @@
+Alias /static /{{ web_path }}/static
+<Directory /{{ web_path}}/static>
+    Require all granted
+</Directory>
+
+<Directory {{ web_path }}/koku/koku/>
+<Files wsgi.py>
+Require all granted
+</Files>
+</Directory>
+
+WSGIDaemonProcess koku python-path={{ web_path }}:{{ web_path }}/env/lib/python3.4/site-packages
+#WSGIPythonHome {{ web_path }}/koku/env
+#WSGIPythonPath {{ web_path }}
+WSGIProcessGroup koku
+WSGIScriptAlias / {{ web_path }}/koku/koku/wsgi.py

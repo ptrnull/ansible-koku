@@ -1,0 +1,12 @@
+---
+# defaults file for project-koku
+web_path: /var/www/html/koku
+packages:
+  - git
+  - docker
+  - gcc
+  - python3-devel
+  - mod_wsgi
+  - httpd
+  - python3-pip
+  - docker-compose

@@ -1,0 +1,89 @@
+---
+# tasks file for project-koku
+- name: install dependencies
+  yum:
+    name: epel-release
+    state: latest
+
+- name: install dependencies
+  yum:
+    name: "{{ packages }}"
+    state: latest
+
+- name: enable docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: enable docker service
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: enable httpd service
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+
+- name: clone git repo
+  git:
+    repo: https://github.com/project-koku/koku
+    dest: "{{ web_path }}"
+    force: yes
+
+- name: pipenv install
+  pip:
+    name: pipenv
+    executable: pip3.6
+
+- name: copy env file
+  copy:
+    remote_src : yes
+    src: "{{ web_path }}/.env.example"
+    dest: "{{ web_path }}/.env"
+
+# Bugfix for the psycopg2 pip package missing
+- name: adding psycopg2 to the Pipfile
+  ini_file:
+    path: "{{ web_path }}/Pipfile"
+    section: dev-packages
+    option: psycopg2
+    value: '"==2.8.4"'
+
+- name: install pip dependencies
+  command: pipenv install --dev --sequential
+  args:
+    chdir: "{{ web_path }}"
+
+- name: Add another bin dir to system-wide $PATH.
+  copy:
+    dest: /etc/profile.d/pipenv.sh
+    content: 'PATH=$PATH:/usr/local/bin'
+
+- name: Initialize the docker network for koku services if it doesn't already exist
+  command: docker network create koku-network
+  ignore_errors: yes
+
+- name: launch psql container
+  command: pipenv run make docker-up-db
+  args:
+    chdir: "{{ web_path }}"
+
+- name: init the db
+  command: pipenv run make run-migrations
+  args:
+    chdir: "{{ web_path }}"
+
+- name: run the koku server
+  shell: nohup pipenv run "{{ web_path }}"/run_server.sh &> /var/log/koku.log &
+  args:
+    chdir: "{{ web_path }}"
+  async: 0
+  poll: 0
+
+#- debug:
+#    msg: Koku running in http://{{  ansible_default_ipv4["address"] }}:8000
+#  when: ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) is defined
