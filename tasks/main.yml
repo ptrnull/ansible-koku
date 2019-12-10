@@ -45,14 +45,6 @@
     src: "{{ web_path }}/.env.example"
     dest: "{{ web_path }}/.env"
 
-# Bugfix for the psycopg2 pip package missing
-- name: adding psycopg2 to the Pipfile
-  ini_file:
-    path: "{{ web_path }}/Pipfile"
-    section: dev-packages
-    option: psycopg2
-    value: '"==2.8.4"'
-
 - name: install pip dependencies
   command: pipenv install --dev --sequential
   args:
